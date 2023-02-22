@@ -126,3 +126,7 @@ def migrate(env, version):
             "stock.sequence_tracking",
         ],
     )
+    for move in env["stock.move"].search([]):
+        move.description_picking = move.product_id.with_context(
+            lang=move._get_lang()
+        )._get_description(move.picking_id.picking_type_id)

@@ -397,6 +397,14 @@ def _remove_table_constraints(env):
 
 @openupgrade.migrate()
 def migrate(env, version):
+    openupgrade.logged_query(
+        env.cr,
+        """
+        UPDATE ir_translation
+        SET type = 'model_terms', src = 'Payment terms: 30 Days'
+        WHERE name = 'account.payment.term,note' AND module = 'account' AND type = 'model'
+        """
+    )
     openupgrade.set_xml_ids_noupdate_value(
         env, "account", ["action_account_resequence"], True
     )
