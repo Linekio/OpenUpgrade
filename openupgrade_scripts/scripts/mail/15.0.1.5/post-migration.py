@@ -211,6 +211,7 @@ def mako_html_to_qweb(string):
     string = _migrate_else(string)
     string = _migrate_end(string)
     string = _migrate_set(string)
+    string = _migrate_html_attributes(string)
     return string
 
 

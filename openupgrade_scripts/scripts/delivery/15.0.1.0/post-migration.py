@@ -33,6 +33,23 @@ def _move_data_from_product_packaging_to_stock_package_type(env):
         WHERE spt.old_product_packaging_id = sqp.packaging_id
         """,
     )
+    openupgrade.logged_query(
+        env.cr,
+        """
+        UPDATE ir_model_data imd
+        SET model = 'stock.package.type', res_id = spt.id
+        FROM stock_package_type spt
+        WHERE model = 'product.packaging'
+            AND spt.old_product_packaging_id = imd.res_id
+        """,
+    )
+    openupgrade.logged_query(
+        env.cr,
+        """
+        DELETE FROM product_packaging
+        WHERE product_id IS NULL
+        """,
+    )
 
 
 @openupgrade.migrate()
