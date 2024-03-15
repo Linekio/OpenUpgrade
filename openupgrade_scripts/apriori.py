@@ -46,6 +46,7 @@ renamed_modules = {
     # OCA/l10n-italy
     "l10n_it_ricevute_bancarie": "l10n_it_riba",
     # OCA/...
+    "erp_beans": "erp_letz",
 }
 
 # Merged modules contain a mapping from old module names to other,
