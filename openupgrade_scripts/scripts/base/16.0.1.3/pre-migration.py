@@ -2,11 +2,13 @@
 # Copyright 2020 Opener B.V. <stefan@opener.am>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 import logging
+import csv
 
 from openupgradelib import openupgrade
 
 from odoo import tools
-
+from odoo import api, SUPERUSER_ID
+from odoo.modules.module import get_module_resource
 from odoo.addons.openupgrade_scripts.apriori import merged_modules, renamed_modules
 
 _logger = logging.getLogger(__name__)
@@ -115,6 +117,68 @@ def update_translatable_fields(cr):
         )
 
 
+def update_res_country_state_xmlids(cr):
+    cr.execute(
+        """
+            SELECT imd.name, imd.res_id
+            FROM ir_model_data imd
+            LEFT JOIN res_country_state rcs ON imd.res_id = rcs.id
+            WHERE imd.module = 'base' AND imd.model = 'res.country.state'
+        """
+    )
+    res_country_state = {}
+    for xmlid, res_id in cr.fetchall():
+        res_country_state[xmlid] = res_id
+    cr.execute(
+        """
+            SELECT imd.name, imd.res_id
+            FROM ir_model_data imd
+            LEFT JOIN res_country rc ON imd.res_id = rc.id
+            WHERE imd.module = 'base' AND imd.model = 'res.country'
+        """
+    )
+    res_country = {}
+    for xmlid, res_id in cr.fetchall():
+        res_country[xmlid] = res_id
+    cr.execute(
+        """
+        SELECT id, country_id, code
+        FROM res_country_state
+        """
+    )
+    by_country_code = {}
+    by_res_id = {}
+    for res_id, country_id, code in cr.fetchall():
+        by_country_code[country_id, code] = res_id
+        by_res_id[res_id] = country_id, code
+
+    todo = []
+    file_path = get_module_resource("base", "data", "res.country.state.csv")
+    with open(file_path) as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            record = res_country_state.get(row["id"])
+            country_id = res_country.get(row["country_id:id"])
+            code = row["code"]
+            if record:
+                continue
+            record = by_country_code.get((country_id, code))
+            if not record:
+                continue
+            todo.append((record, row["id"]))
+    for res_id, name in todo:
+        openupgrade.logged_query(
+            cr,
+            """
+            INSERT INTO ir_model_data (create_uid, create_date, write_date, write_uid,
+                res_id, noupdate, name, module, model)
+            VALUES (%(superuser)s, NOW(), NOW(), %(superuser)s, %(res_id)s, false,
+                %(name)s, 'base', 'res.country.state')
+            """,
+            {"superuser": SUPERUSER_ID, "res_id": res_id, "name": name},
+        )
+
+
 @openupgrade.migrate(use_env=False)
 def migrate(cr, version):
     """
@@ -140,3 +204,4 @@ def migrate(cr, version):
     )
     # update all translatable fields
     update_translatable_fields(cr)
+    update_res_country_state_xmlids(cr)
