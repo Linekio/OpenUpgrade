@@ -168,7 +168,7 @@ def _convert_carrier_zip_ranges(env):
                 continue
         carrier = env["delivery.carrier"].browse(carrier_id)
         for prefix in prefixes:
-            prefix_record = env["delivery.zip.prefix"].search([("name", "=", prefix)])
+            prefix_record = env["delivery.zip.prefix"].search([("name", "=", prefix.upper())])
             if not prefix_record:
                 prefix_record = env["delivery.zip.prefix"].create({"name": prefix})
             carrier.zip_prefix_ids |= prefix_record
