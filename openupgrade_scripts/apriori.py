@@ -98,6 +98,7 @@ merged_modules = {
     # OCA/stock-logistics-workflow
     "stock_move_line_auto_fill": "stock",
     # OCA/...
+    "mail_bcc": "mail_composer_cc_bcc",
 }
 
 # only used here for upgrade_analysis
