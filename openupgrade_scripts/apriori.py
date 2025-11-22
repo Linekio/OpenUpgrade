@@ -48,6 +48,8 @@ renamed_modules = {
     "web_widget_product_label_section_and_note": "web_widget_product_label_section_and_note_name_visibility",  # noqa: E501
     # OCA/...
     "yealink": "callcenter",
+    "delivery_dpd_be": "dpd_benelux_shipping_ns",
+    "fedex_shipping":"fedex_delivery",
 }
 
 # Merged modules contain a mapping from old module names to other,

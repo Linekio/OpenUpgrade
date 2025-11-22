@@ -17,6 +17,29 @@ _renamed_xmlids = [
 ]
 
 
+tofix = [("state_be_9", "WLX", "be")]
+
+
+def fix_expression_xmlids(cr):
+    for xmlid, code, parent_xml_id in tofix:
+        cr.execute(
+            """
+            SELECT id
+            FROM res_country_state
+            WHERE code = %s AND country_id IN (SELECT res_id FROM ir_model_data WHERE module = 'base' AND name = %s)
+            LIMIT 1
+            """,
+            (
+                code,
+                parent_xml_id,
+            ),
+        )
+        for (res_id,) in cr.fetchall():
+            __import__("logging").getLogger("juc").debug(res_id)
+            __import__("logging").getLogger("juc").debug(xmlid)
+            openupgrade.add_xmlid(cr, "base", xmlid, "res.country.state", res_id)
+
+
 def _fix_list_view_type(cr):
     """
     Former tree views have view type list now.
@@ -91,3 +114,5 @@ def migrate(cr, version):
     _fix_list_view_mode(cr)
     _fix_serbian_res_lang_record(cr)
     _fix_company_layout_background(cr)
+    fix_expression_xmlids(cr)
+    cr.execute("UPDATE res_users SET website_id = NULL")

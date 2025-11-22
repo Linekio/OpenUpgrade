@@ -16,6 +16,7 @@ def migrate(env, version=None):
         {openupgrade.get_legacy_name('web_tour_tour')} legacy_table,
         web_tour_tour
         WHERE web_tour_tour.name=legacy_table.name
+            AND legacy_table.user_id IS NOT NULL
         ON CONFLICT DO NOTHING
         """,
     )
