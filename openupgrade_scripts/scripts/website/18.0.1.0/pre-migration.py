@@ -14,6 +14,7 @@ _new_columns = [
 
 @openupgrade.migrate()
 def migrate(env, version):
+    env.cr.execute("UPDATE res_users SET website_id = NULL")
     openupgrade.rename_columns(env.cr, _column_renames)
     openupgrade.add_columns(env, _new_columns)
     openupgrade.logged_query(

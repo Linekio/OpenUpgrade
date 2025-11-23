@@ -115,4 +115,3 @@ def migrate(cr, version):
     _fix_serbian_res_lang_record(cr)
     _fix_company_layout_background(cr)
     fix_expression_xmlids(cr)
-    cr.execute("UPDATE res_users SET website_id = NULL")
