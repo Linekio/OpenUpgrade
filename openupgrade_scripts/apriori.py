@@ -99,7 +99,6 @@ merged_modules = {
     "stock_move_line_auto_fill": "stock",
     # OCA/...
     "mail_bcc": "mail_composer_cc_bcc",
-    "od_journal_sequence": "account_move_name_sequence",
 }
 
 # only used here for upgrade_analysis
