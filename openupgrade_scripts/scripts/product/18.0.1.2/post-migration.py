@@ -76,3 +76,10 @@ def migrate(env, version):
     res_partner_specific_property_product_pricelist(env)
     delete_combo_items_without_combo(env)
     openupgrade_180.convert_company_dependent(env, "product.product", "standard_price")
+    openupgrade.logged_query(
+        env.cr,
+        """
+        UPDATE product_pricelist
+        SET active = 'f'
+        """,
+    )
